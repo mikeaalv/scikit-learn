@@ -462,7 +462,7 @@ class _CalibratedClassifier:
         proba[np.isnan(proba)] = 1. / n_classes
 
         # Deal with cases where the predicted probability minimally exceeds 1.0
-        proba[(1.0 < proba) & (proba <= 1.0 + 1e-5)] = 1.0
+        proba[(proba > 1.0) & (proba <= 1.0 + 1e-5)] = 1.0
 
         return proba
 

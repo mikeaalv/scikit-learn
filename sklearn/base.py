@@ -65,17 +65,16 @@ def clone(estimator, *, safe=True):
     elif not hasattr(estimator, 'get_params') or isinstance(estimator, type):
         if not safe:
             return copy.deepcopy(estimator)
+        if isinstance(estimator, type):
+            raise TypeError("Cannot clone object. " +
+                            "You should provide an instance of " +
+                            "scikit-learn estimator instead of a class.")
         else:
-            if isinstance(estimator, type):
-                raise TypeError("Cannot clone object. " +
-                                "You should provide an instance of " +
-                                "scikit-learn estimator instead of a class.")
-            else:
-                raise TypeError("Cannot clone object '%s' (type %s): "
-                                "it does not seem to be a scikit-learn "
-                                "estimator as it does not implement a "
-                                "'get_params' method."
-                                % (repr(estimator), type(estimator)))
+            raise TypeError("Cannot clone object '%s' (type %s): "
+                            "it does not seem to be a scikit-learn "
+                            "estimator as it does not implement a "
+                            "'get_params' method."
+                            % (repr(estimator), type(estimator)))
 
     klass = estimator.__class__
     new_object_params = estimator.get_params(deep=False)
@@ -114,7 +113,7 @@ def _pprint(params, offset=0, printer=repr):
     # Do a multi-line justified repr:
     options = np.get_printoptions()
     np.set_printoptions(precision=5, threshold=64, edgeitems=2)
-    params_list = list()
+    params_list = []
     this_line_length = offset
     line_sep = ',\n' + (1 + offset // 2) * ' '
     for i, (k, v) in enumerate(sorted(params.items())):
@@ -197,7 +196,7 @@ class BaseEstimator:
         params : mapping of string to any
             Parameter names mapped to their values.
         """
-        out = dict()
+        out = {}
         for key in self._get_param_names():
             try:
                 value = getattr(self, key)

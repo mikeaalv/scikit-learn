@@ -94,11 +94,7 @@ def _k_init(X, n_clusters, x_squared_norms, random_state, n_local_trials=None):
 
     # Pick first center randomly
     center_id = random_state.randint(n_samples)
-    if sp.issparse(X):
-        centers[0] = X[center_id].toarray()
-    else:
-        centers[0] = X[center_id]
-
+    centers[0] = X[center_id].toarray() if sp.issparse(X) else X[center_id]
     # Initialize list of closest distances and calculate current potential
     closest_dist_sq = euclidean_distances(
         centers[0, np.newaxis], X, Y_norm_squared=x_squared_norms,
@@ -976,7 +972,7 @@ class KMeans(TransformerMixin, ClusterMixin, BaseEstimator):
                         order='C', accept_large_sparse=False)
         n_samples, n_features = X.shape
         expected_n_features = self.cluster_centers_.shape[1]
-        if not n_features == expected_n_features:
+        if n_features != expected_n_features:
             raise ValueError(
                 f"Incorrect number of features. Got {n_features} features, "
                 f"expected {expected_n_features}.")
@@ -1386,7 +1382,7 @@ def _mini_batch_convergence(model, iteration_idx, n_iter, tol,
         ewa_inertia = batch_inertia
     else:
         alpha = float(model.batch_size) * 2.0 / (n_samples + 1)
-        alpha = 1.0 if alpha > 1.0 else alpha
+        alpha = min(alpha, 1.0)
         ewa_diff = ewa_diff * (1 - alpha) + centers_squared_diff * alpha
         ewa_inertia = ewa_inertia * (1 - alpha) + batch_inertia * alpha
 

@@ -108,6 +108,8 @@ def barplot_neighbors(Nrange=2 ** np.arange(1, 11),
 
     plt.figure(figsize=(8, 11))
 
+    width = 0.8
+
     for (sbplt, vals, quantity,
          build_time, query_time) in [(311, Nrange, 'N',
                                       N_results_build,
@@ -129,8 +131,6 @@ def barplot_neighbors(Nrange=2 ** np.arange(1, 11),
 
         for i, alg in enumerate(algorithms):
             xvals = 0.1 + i * (1 + len(vals)) + np.arange(len(vals))
-            width = 0.8
-
             c_bar = plt.bar(xvals, build_time[alg] - bottom,
                             width, bottom, color='r')
             q_bar = plt.bar(xvals, query_time[alg],
@@ -156,13 +156,12 @@ def barplot_neighbors(Nrange=2 ** np.arange(1, 11),
 
         title_string = 'Varying %s' % quantity
 
-        descr_string = ''
+        descr_string = ''.join(
+            '%s = %i, ' % (s, fiducial_values[s])
+            for s in 'NDk'
+            if s != quantity
+        )
 
-        for s in 'NDk':
-            if s == quantity:
-                pass
-            else:
-                descr_string += '%s = %i, ' % (s, fiducial_values[s])
 
         descr_string = descr_string[:-2]
 

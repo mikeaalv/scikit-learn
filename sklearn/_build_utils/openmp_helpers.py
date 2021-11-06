@@ -83,9 +83,8 @@ def check_openmp_support():
     if not openmp_supported:
         if os.getenv("SKLEARN_FAIL_NO_OPENMP"):
             raise CompileError("Failed to build with OpenMP")
-        else:
-            message = textwrap.dedent(
-                """
+        message = textwrap.dedent(
+            """
 
                                 ***********
                                 * WARNING *
@@ -109,6 +108,6 @@ def check_openmp_support():
 
                                     ***
                 """)
-            warnings.warn(message)
+        warnings.warn(message)
 
     return openmp_supported

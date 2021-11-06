@@ -500,10 +500,12 @@ class _BaseDiscreteNB(_BaseNB):
         if np.min(self.alpha) < 0:
             raise ValueError('Smoothing parameter alpha = %.1e. '
                              'alpha should be > 0.' % np.min(self.alpha))
-        if isinstance(self.alpha, np.ndarray):
-            if not self.alpha.shape[0] == self.n_features_:
-                raise ValueError("alpha should be a scalar or a numpy array "
-                                 "with shape [n_features]")
+        if (
+            isinstance(self.alpha, np.ndarray)
+            and self.alpha.shape[0] != self.n_features_
+        ):
+            raise ValueError("alpha should be a scalar or a numpy array "
+                             "with shape [n_features]")
         if np.min(self.alpha) < _ALPHA_MIN:
             warnings.warn('alpha too small will result in numeric errors, '
                           'setting alpha = %.1e' % _ALPHA_MIN)
@@ -1216,10 +1218,7 @@ class CategoricalNB(_BaseDiscreteNB):
         def _update_cat_count(X_feature, Y, cat_count, n_classes):
             for j in range(n_classes):
                 mask = Y[:, j].astype(bool)
-                if Y.dtype.type == np.int64:
-                    weights = None
-                else:
-                    weights = Y[mask, j]
+                weights = None if Y.dtype.type == np.int64 else Y[mask, j]
                 counts = np.bincount(X_feature[mask], weights=weights)
                 indices = np.nonzero(counts)[0]
                 cat_count[j, indices] += counts[indices]
@@ -1244,12 +1243,11 @@ class CategoricalNB(_BaseDiscreteNB):
         self.feature_log_prob_ = feature_log_prob
 
     def _joint_log_likelihood(self, X):
-        if not X.shape[1] == self.n_features_:
+        if X.shape[1] != self.n_features_:
             raise ValueError("Expected input with %d features, got %d instead"
                              % (self.n_features_, X.shape[1]))
         jll = np.zeros((X.shape[0], self.class_count_.shape[0]))
         for i in range(self.n_features_):
             indices = X[:, i]
             jll += self.feature_log_prob_[i][:, indices].T
-        total_ll = jll + self.class_log_prior_
-        return total_ll
+        return jll + self.class_log_prior_

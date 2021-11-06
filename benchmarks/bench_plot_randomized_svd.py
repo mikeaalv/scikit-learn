@@ -149,7 +149,7 @@ def get_data(dataset_name):
         if handle_missing_dataset(SVHN_FOLDER) == 0:
             return
         X1 = sp.io.loadmat("%strain_32x32.mat" % SVHN_FOLDER)['X']
-        X2 = [X1[:, :, :, i].reshape(32 * 32 * 3) for i in range(X1.shape[3])]
+        X2 = [X1[:, :, :, i].reshape(32**2 * 3) for i in range(X1.shape[3])]
         X = np.vstack(X2)
         del X1
         del X2
@@ -244,15 +244,13 @@ def svd_timing(X, n_comps, n_iter, n_oversamples,
         U, mu, V = randomized_svd(X, n_comps, n_oversamples, n_iter,
                                   power_iteration_normalizer,
                                   random_state=random_state, transpose=False)
-        call_time = time() - t0
     else:
         gc.collect()
         t0 = time()
         # There is a different convention for l here
         U, mu, V = fbpca.pca(X, n_comps, raw=True, n_iter=n_iter,
                              l=n_oversamples+n_comps)
-        call_time = time() - t0
-
+    call_time = time() - t0
     return U, mu, V, call_time
 
 
@@ -268,13 +266,13 @@ def norm_diff(A, norm=2, msg=True):
         print("... computing %s norm ..." % norm)
     if norm == 2:
         # s = sp.linalg.norm(A, ord=2)  # slow
-        value = sp.sparse.linalg.svds(A, k=1, return_singular_vectors=False)
+        return sp.sparse.linalg.svds(A, k=1, return_singular_vectors=False)
     else:
-        if sp.sparse.issparse(A):
-            value = sp.sparse.linalg.norm(A, ord=norm)
-        else:
-            value = sp.linalg.norm(A, ord=norm)
-    return value
+        return (
+            sp.sparse.linalg.norm(A, ord=norm)
+            if sp.sparse.issparse(A)
+            else sp.linalg.norm(A, ord=norm)
+        )
 
 
 def scalable_frobenius_norm_discrepancy(X, U, s, V):
@@ -420,7 +418,7 @@ def bench_c(datasets, n_comps):
             f = scalable_frobenius_norm_discrepancy(X, U, s, V)
             all_frobenius[label].append(f / X_fro_norm)
 
-    if len(all_time) == 0:
+    if not all_time:
         raise ValueError("No tests ran. Aborting.")
 
     if enable_spectral_norm:

@@ -203,11 +203,6 @@ class _CFNode:
                     self.subclusters_[closest_index].centroid_
                 self.init_sq_norm_[closest_index] = \
                     self.subclusters_[closest_index].sq_norm_
-                return False
-
-            # things not too good. we need to redistribute the subclusters in
-            # our child node, and add a new subcluster in the parent
-            # subcluster to accommodate the new child.
             else:
                 new_subcluster1, new_subcluster2 = _split_node(
                     closest_subcluster.child_, threshold, branching_factor)
@@ -216,9 +211,8 @@ class _CFNode:
 
                 if len(self.subclusters_) > self.branching_factor:
                     return True
-                return False
+            return False
 
-        # good to go!
         else:
             merged = closest_subcluster.merge_subcluster(
                 subcluster, self.threshold)
@@ -490,11 +484,7 @@ class Birch(ClusterMixin, TransformerMixin, BaseEstimator):
             self.root_.prev_leaf_ = self.dummy_leaf_
 
         # Cannot vectorize. Enough to convince to use cython.
-        if not sparse.issparse(X):
-            iter_func = iter
-        else:
-            iter_func = _iterate_sparse_X
-
+        iter_func = iter if not sparse.issparse(X) else _iterate_sparse_X
         for sample in iter_func(X):
             subcluster = _CFSubcluster(linear_sum=sample)
             split = self.root_.insert_cf_subcluster(subcluster)

@@ -24,6 +24,7 @@ attributes in the SVG file.
 group1 through groupN are group ids.  If only want particular groups used,
 enter their ids here and all others will be ignored.
 """
+
 import os
 import re
 import sys
@@ -80,8 +81,8 @@ for e in elements:
     parsed_groups[e.getAttribute('id')] = paths
 
 out = []
-for g in parsed_groups:
-    for path in parsed_groups[g]:
+for g, value in parsed_groups.items():
+    for path in value:
         out.append('<area href="#" title="%s" shape="poly" coords="%s"></area>' %
             (path[0], ', '.join([("%d,%d" % (p[0]*width_ratio, p[1]*height_ratio)) for p in path[1]])))
 

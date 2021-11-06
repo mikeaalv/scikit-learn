@@ -187,10 +187,9 @@ def _gaussian_random_matrix(n_components, n_features, random_state=None):
     """
     _check_input_size(n_components, n_features)
     rng = check_random_state(random_state)
-    components = rng.normal(loc=0.0,
+    return rng.normal(loc=0.0,
                             scale=1.0 / np.sqrt(n_components),
                             size=(n_components, n_features))
-    return components
 
 
 def _sparse_random_matrix(n_components, n_features, density='auto',
@@ -410,9 +409,8 @@ class BaseRandomProjection(TransformerMixin, BaseEstimator, metaclass=ABCMeta):
                 'X at fit stage had a different number of features. '
                 '(%s != %s)' % (X.shape[1], self.components_.shape[1]))
 
-        X_new = safe_sparse_dot(X, self.components_.T,
+        return safe_sparse_dot(X, self.components_.T,
                                 dense_output=self.dense_output)
-        return X_new
 
 
 class GaussianRandomProjection(BaseRandomProjection):
