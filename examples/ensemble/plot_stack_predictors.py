@@ -101,7 +101,7 @@ categories = [
     X[column].unique() for column in X[cat_cols]]
 
 for cat in categories:
-    cat[cat == None] = 'missing'  # noqa
+    cat[cat is None] = 'missing'
 
 cat_proc_nlin = make_pipeline(
     SimpleImputer(missing_values=None, strategy='constant',

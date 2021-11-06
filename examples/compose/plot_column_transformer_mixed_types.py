@@ -23,6 +23,7 @@ using :class:`~pipeline.Pipeline`, together with a simple classification
 model.
 """
 
+
 # Author: Pedro Morales <part.morales@gmail.com>
 #
 # License: BSD 3 clause
@@ -182,7 +183,7 @@ grid_search
 #
 grid_search.fit(X_train, y_train)
 
-print(f"Best params:")
+print('Best params:')
 print(grid_search.best_params_)
 
 # %%

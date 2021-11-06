@@ -15,6 +15,7 @@ A small value of `C` includes more/all the observations, allowing
 the margins to be calculated using all the data in the area.
 
 """
+
 print(__doc__)
 
 
@@ -31,11 +32,8 @@ np.random.seed(0)
 X = np.r_[np.random.randn(20, 2) - [2, 2], np.random.randn(20, 2) + [2, 2]]
 Y = [0] * 20 + [1] * 20
 
-# figure number
-fignum = 1
-
 # fit the model
-for name, penalty in (('unreg', 1), ('reg', 0.05)):
+for fignum, (name, penalty) in enumerate((('unreg', 1), ('reg', 0.05)), start=1):
 
     clf = svm.SVC(kernel='linear', C=penalty)
     clf.fit(X, Y)
@@ -85,6 +83,4 @@ for name, penalty in (('unreg', 1), ('reg', 0.05)):
 
     plt.xticks(())
     plt.yticks(())
-    fignum = fignum + 1
-
 plt.show()

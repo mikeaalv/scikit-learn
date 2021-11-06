@@ -396,10 +396,7 @@ class AffinityPropagation(ClusterMixin, BaseEstimator):
         self
 
         """
-        if self.affinity == "precomputed":
-            accept_sparse = False
-        else:
-            accept_sparse = 'csr'
+        accept_sparse = False if self.affinity == "precomputed" else 'csr'
         X = self._validate_data(X, accept_sparse=accept_sparse)
         if self.affinity == "precomputed":
             self.affinity_matrix_ = X
@@ -445,11 +442,10 @@ class AffinityPropagation(ClusterMixin, BaseEstimator):
 
         if self.cluster_centers_.shape[0] > 0:
             return pairwise_distances_argmin(X, self.cluster_centers_)
-        else:
-            warnings.warn("This model does not have any cluster centers "
-                          "because affinity propagation did not converge. "
-                          "Labeling every sample as '-1'.", ConvergenceWarning)
-            return np.array([-1] * X.shape[0])
+        warnings.warn("This model does not have any cluster centers "
+                      "because affinity propagation did not converge. "
+                      "Labeling every sample as '-1'.", ConvergenceWarning)
+        return np.array([-1] * X.shape[0])
 
     def fit_predict(self, X, y=None):
         """Fit the clustering from features or affinity matrix, and return

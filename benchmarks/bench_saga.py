@@ -169,7 +169,7 @@ def exp(solvers, penalty, single_target,
 
     res = []
     idx = 0
-    for dtype_name in dtypes_mapping.keys():
+    for dtype_name in dtypes_mapping:
         for solver in solvers:
             if not (skip_slow and
                     solver == 'lightning' and
